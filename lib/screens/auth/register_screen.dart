@@ -40,7 +40,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (mounted) {
-        // Fecha a tela de registro; o AuthWrapper redirecionará para a tela principal
         Navigator.of(context).pop();
       }
     } catch (errorMessage) {
@@ -107,8 +106,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-
-                  // Campo E-mail
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -143,8 +140,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 18),
-
-                  // Campo Senha
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -184,8 +179,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 18),
-
-                  // Campo Confirmar Senha
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
@@ -226,8 +219,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 28),
-
-                  // Botão Criar Conta
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleRegister,
                     style: ElevatedButton.styleFrom(
@@ -254,8 +245,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Voltar para Login
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

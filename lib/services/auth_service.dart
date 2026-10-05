@@ -3,13 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Stream para monitorar alterações no estado de autenticação em tempo real
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Usuário atualmente autenticado
   User? get currentUser => _auth.currentUser;
 
-  // Realizar cadastro com e-mail e senha
   Future<UserCredential> signUpWithEmailAndPassword({
     required String email,
     required String password,
@@ -27,7 +24,6 @@ class AuthService {
     }
   }
 
-  // Realizar login com e-mail e senha
   Future<UserCredential> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -45,12 +41,10 @@ class AuthService {
     }
   }
 
-  // Fazer logout
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  // Tradução amigável de erros do Firebase Auth
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':

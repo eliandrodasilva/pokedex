@@ -9,8 +9,6 @@ class PokemonApiService {
 
   PokemonApiService({http.Client? client}) : _client = client ?? http.Client();
 
-  /// Carrega uma lista paginada de Pokémon a partir da PokéAPI
-  /// Realiza o carregamento dos detalhes em paralelo para obter os dados completos (imagem oficial, tipos, etc.)
   Future<List<Pokemon>> fetchPokemonList({int offset = 0, int limit = 20}) async {
     try {
       final url = Uri.parse('$_baseUrl?offset=$offset&limit=$limit');
@@ -23,7 +21,6 @@ class PokemonApiService {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final results = data['results'] as List<dynamic>? ?? [];
 
-      // Buscar detalhes de cada Pokémon em paralelo
       final futures = results.map((item) async {
         final detailUrl = Uri.parse(item['url'].toString());
         final detailResponse = await _client.get(detailUrl).timeout(const Duration(seconds: 10));
@@ -44,7 +41,6 @@ class PokemonApiService {
     }
   }
 
-  /// Busca um Pokémon específico diretamente pelo nome ou ID
   Future<Pokemon> fetchPokemonByNameOrId(String query) async {
     final cleanQuery = query.trim().toLowerCase();
     if (cleanQuery.isEmpty) {

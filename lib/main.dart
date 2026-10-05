@@ -17,7 +17,7 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    debugPrint('Aviso de inicialização do Firebase: $e');
+    debugPrint('Firebase init: $e');
   }
 
   runApp(const PokedexApp());
@@ -39,16 +39,12 @@ class PokedexApp extends StatelessWidget {
           surface: AppColors.background,
         ),
         scaffoldBackgroundColor: AppColors.background,
-        fontFamily: null, // Usa a fonte padrão do sistema com boa legibilidade
       ),
       home: const AuthWrapper(),
     );
   }
 }
 
-/// O AuthWrapper observa as mudanças de autenticação (login/logout) em tempo real.
-/// Se houver um usuário autenticado, direciona para o MainNavigationScreen.
-/// Caso contrário, apresenta a tela de LoginScreen.
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -57,20 +53,17 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: AuthService().authStateChanges,
       builder: (context, snapshot) {
-        // Enquanto o Firebase restaura o estado da sessão local
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             backgroundColor: AppColors.background,
-            body: LoadingWidget(message: 'Restaurando sessão do treinador...'),
+            body: LoadingWidget(message: 'Carregando Pokédex...'),
           );
         }
 
-        // Se o usuário já está autenticado
         if (snapshot.hasData && snapshot.data != null) {
           return const MainNavigationScreen();
         }
 
-        // Se não há usuário autenticado
         return const LoginScreen();
       },
     );

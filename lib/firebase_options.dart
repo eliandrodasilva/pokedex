@@ -1,6 +1,3 @@
-// Arquivo de configuração do Firebase.
-// Substitua ou execute `flutterfire configure` para vincular automaticamente com o seu projeto no Firebase Console.
-// ignore_for_file: type=lint
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
@@ -40,6 +37,7 @@ class DefaultFirebaseOptions {
     projectId: 'pokedex-app-515df',
     storageBucket: 'pokedex-app-515df.firebasestorage.app',
   );
+
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'YOUR_API_KEY',
     appId: '1:000000000000:ios:0000000000000000000000',

@@ -36,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      // O StreamBuilder no AuthWrapper cuidará da navegação automática após autenticar
     } catch (errorMessage) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -75,7 +74,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Ícone / Logo Pokédex estilizado
                   Container(
                     width: 90,
                     height: 90,
@@ -107,8 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Títulos
                   const Text(
                     'Pokédex App',
                     textAlign: TextAlign.center,
@@ -129,8 +125,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 36),
-
-                  // Campo E-mail
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -165,8 +159,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 18),
-
-                  // Campo Senha
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -204,8 +196,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 28),
-
-                  // Botão Entrar
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
@@ -232,8 +222,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Redirecionamento para Cadastro
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

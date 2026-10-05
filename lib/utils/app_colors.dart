@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Paleta principal inspirada no universo Pokémon
   static const Color primaryRed = Color(0xFFDC0A2D);
   static const Color darkRed = Color(0xFF8F1E1E);
   static const Color accentBlue = Color(0xFF2B73B9);
   static const Color accentYellow = Color(0xFFFFCB05);
 
-  // Fundos e Neutros
   static const Color background = Color(0xFFF7F8FA);
   static const Color surface = Colors.white;
   static const Color cardBg = Colors.white;
@@ -15,7 +13,6 @@ class AppColors {
   static const Color textSecondary = Color(0xFF747476);
   static const Color divider = Color(0xFFE5E7EB);
 
-  // Tipos de Pokémon
   static const Map<String, Color> typeColors = {
     'normal': Color(0xFFA8A878),
     'fire': Color(0xFFF08030),

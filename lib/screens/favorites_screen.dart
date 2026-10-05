@@ -35,7 +35,7 @@ class FavoritesScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Os favoritos sincronizados com Cloud Firestore serão implementados nos Dias 3 e 4.',
+                'Os favoritos sincronizados com Cloud Firestore serão implementados no Dia 4.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.textSecondary),
               ),

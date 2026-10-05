@@ -44,7 +44,6 @@ class PokemonCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           child: Stack(
             children: [
-              // Círculo translúcido de fundo
               Positioned(
                 right: -15,
                 bottom: -15,
@@ -57,13 +56,11 @@ class PokemonCard extends StatelessWidget {
                   ),
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Topo: Número e Botão de Favorito
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -93,10 +90,7 @@ class PokemonCard extends StatelessWidget {
                           ),
                       ],
                     ),
-
                     const Spacer(),
-
-                    // Imagem central do Pokémon
                     Center(
                       child: Hero(
                         tag: 'pokemon-image-${pokemon.id}',
@@ -125,10 +119,7 @@ class PokemonCard extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     const Spacer(),
-
-                    // Nome do Pokémon
                     Text(
                       pokemon.formattedName,
                       maxLines: 1,
@@ -140,8 +131,6 @@ class PokemonCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-
-                    // Chips de Tipos
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,

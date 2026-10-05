@@ -88,7 +88,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Avatar do Treinador
               Container(
                 width: 110,
                 height: 110,
@@ -113,8 +112,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Informações do Usuário
               const Text(
                 'Treinador Pokémon',
                 style: TextStyle(
@@ -148,8 +145,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 36),
-
-              // Card com Detalhes da Conta
               Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -195,8 +190,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Botão de Sair da Conta
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(

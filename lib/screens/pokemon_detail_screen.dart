@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../models/pokemon.dart';
+import '../services/favorites_service.dart';
 import '../utils/app_colors.dart';
 
 class PokemonDetailScreen extends StatefulWidget {
@@ -16,7 +17,75 @@ class PokemonDetailScreen extends StatefulWidget {
 }
 
 class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
+  final FavoritesService _favoritesService = FavoritesService();
   bool _isFavorite = false;
+  bool _isToggling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavoriteStatus();
+  }
+
+  Future<void> _checkFavoriteStatus() async {
+    final isFav = await _favoritesService.isFavorite(widget.pokemon.id);
+    if (mounted) {
+      setState(() => _isFavorite = isFav);
+    }
+  }
+
+  Future<void> _handleToggleFavorite() async {
+    if (_isToggling) return;
+
+    setState(() => _isToggling = true);
+
+    try {
+      final newStatus = await _favoritesService.toggleFavorite(widget.pokemon);
+      if (mounted) {
+        setState(() => _isFavorite = newStatus);
+
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(
+                  newStatus ? Icons.favorite : Icons.favorite_border,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    newStatus
+                        ? '${widget.pokemon.formattedName} adicionado aos favoritos!'
+                        : '${widget.pokemon.formattedName} removido dos favoritos.',
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: newStatus ? Colors.green.shade700 : AppColors.primaryRed,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: AppColors.primaryRed,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isToggling = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,33 +103,27 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: Colors.white,
-              size: 28,
-            ),
-            onPressed: () {
-              setState(() {
-                _isFavorite = !_isFavorite;
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    _isFavorite
-                        ? '${pokemon.formattedName} adicionado aos favoritos!'
-                        : '${pokemon.formattedName} removido dos favoritos.',
+            icon: _isToggling
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Icon(
+                    _isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.white,
+                    size: 28,
                   ),
-                  duration: const Duration(seconds: 2),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
+            onPressed: _isToggling ? null : _handleToggleFavorite,
+            tooltip: _isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos',
           ),
         ],
       ),
       body: Column(
         children: [
-          // Cabeçalho: Nome, Número e Tipos
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Row(
@@ -112,10 +175,7 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
-          // Imagem Grande com Hero
           Center(
             child: Hero(
               tag: 'pokemon-image-${pokemon.id}',
@@ -134,10 +194,7 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // Painel inferior com Informações Físicas, Habilidades e Estatísticas
           Expanded(
             child: Container(
               width: double.infinity,
@@ -153,7 +210,6 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Peso e Altura
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -162,10 +218,7 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
                         _buildPhysicalStat('Peso', '${pokemon.weightInKg} kg', Icons.scale_outlined),
                       ],
                     ),
-
                     const SizedBox(height: 24),
-
-                    // Habilidades
                     const Text(
                       'Habilidades',
                       style: TextStyle(
@@ -191,10 +244,7 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
                         );
                       }).toList(),
                     ),
-
                     const SizedBox(height: 24),
-
-                    // Estatísticas Base
                     const Text(
                       'Estatísticas Base',
                       style: TextStyle(
@@ -207,7 +257,6 @@ class _PokemonDetailScreenState extends State<PokemonDetailScreen> {
                     ...pokemon.stats.entries.map((entry) {
                       return _buildStatRow(entry.key, entry.value, typeColor);
                     }),
-
                     const SizedBox(height: 32),
                   ],
                 ),

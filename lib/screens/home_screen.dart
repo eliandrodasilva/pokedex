@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/pokemon.dart';
+import '../services/favorites_service.dart';
 import '../services/pokemon_api_service.dart';
 import '../utils/app_colors.dart';
 import '../widgets/loading_widget.dart';
@@ -15,8 +16,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PokemonApiService _apiService = PokemonApiService();
+  final FavoritesService _favoritesService = FavoritesService();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+
+  late final Stream<Set<int>> _favoriteIdsStream;
 
   final List<Pokemon> _pokemonList = [];
   bool _isLoadingInitial = true;
@@ -27,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _errorMessage;
 
-  // Estados de busca
   bool _isSearching = false;
   bool _isLoadingSearch = false;
   Pokemon? _searchedPokemon;
@@ -36,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _favoriteIdsStream = _favoritesService.getFavoriteIdsStream();
     _loadInitialPokemon();
 
-    // Listener para carregamento incremental (scroll infinito)
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 250 &&
           !_isLoadingMore &&
@@ -56,7 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  // Carregamento inicial da lista
   Future<void> _loadInitialPokemon() async {
     setState(() {
       _isLoadingInitial = true;
@@ -79,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Carregamento incremental ao rolar a tela
   Future<void> _loadMorePokemon() async {
     setState(() => _isLoadingMore = true);
 
@@ -96,12 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoadingMore = false;
       });
     } catch (_) {
-      // Falha silenciosa no carregamento incremental, permite tentar de novo ao rolar
       setState(() => _isLoadingMore = false);
     }
   }
 
-  // Executar pesquisa por nome ou ID
   Future<void> _executeSearch(String query) async {
     final cleanQuery = query.trim();
     if (cleanQuery.isEmpty) {
@@ -109,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    // Fecha o teclado
     FocusScope.of(context).unfocus();
 
     setState(() {
@@ -143,6 +141,49 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _toggleFavorite(Pokemon pokemon) async {
+    try {
+      final newStatus = await _favoritesService.toggleFavorite(pokemon);
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(
+                  newStatus ? Icons.favorite : Icons.favorite_border,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    newStatus
+                        ? '${pokemon.formattedName} adicionado aos favoritos!'
+                        : '${pokemon.formattedName} removido dos favoritos.',
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: newStatus ? Colors.green.shade700 : AppColors.primaryRed,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: AppColors.primaryRed,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
   void _openDetail(Pokemon pokemon) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -172,50 +213,51 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          // Barra de Pesquisa
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: Colors.white,
-            child: TextField(
-              controller: _searchController,
-              textInputAction: TextInputAction.search,
-              onSubmitted: _executeSearch,
-              decoration: InputDecoration(
-                hintText: 'Pesquisar por nome ou ID...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
-                suffixIcon: _searchController.text.isNotEmpty || _isSearching
-                    ? IconButton(
-                        icon: const Icon(Icons.close, color: AppColors.textSecondary),
-                        onPressed: _clearSearch,
-                      )
-                    : null,
-                filled: true,
-                fillColor: AppColors.background,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+      body: StreamBuilder<Set<int>>(
+        stream: _favoriteIdsStream,
+        builder: (context, favSnapshot) {
+          final favoriteIds = favSnapshot.data ?? {};
+
+          return Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                color: Colors.white,
+                child: TextField(
+                  controller: _searchController,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: _executeSearch,
+                  decoration: InputDecoration(
+                    hintText: 'Pesquisar por nome ou ID...',
+                    prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
+                    suffixIcon: _searchController.text.isNotEmpty || _isSearching
+                        ? IconButton(
+                            icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                            onPressed: _clearSearch,
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: AppColors.background,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  onChanged: (_) => setState(() {}),
                 ),
               ),
-              onChanged: (val) {
-                setState(() {});
-              },
-            ),
-          ),
-
-          // Conteúdo da Tela (Lista ou Resultados da Busca)
-          Expanded(
-            child: _buildBody(),
-          ),
-        ],
+              Expanded(
+                child: _buildBody(favoriteIds),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildBody() {
-    // Modo de Busca ativo
+  Widget _buildBody(Set<int> favoriteIds) {
     if (_isSearching) {
       if (_isLoadingSearch) {
         return const LoadingWidget(message: 'Pesquisando na Pokédex...');
@@ -257,6 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       if (_searchedPokemon != null) {
+        final isFav = favoriteIds.contains(_searchedPokemon!.id);
         return Padding(
           padding: const EdgeInsets.all(16),
           child: GridView.count(
@@ -267,6 +310,8 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               PokemonCard(
                 pokemon: _searchedPokemon!,
+                isFavorite: isFav,
+                onFavoriteToggle: () => _toggleFavorite(_searchedPokemon!),
                 onTap: () => _openDetail(_searchedPokemon!),
               ),
             ],
@@ -275,12 +320,10 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    // Carregamento inicial da lista
     if (_isLoadingInitial) {
       return const LoadingWidget(message: 'Carregando Pokédex via PokéAPI...');
     }
 
-    // Erro ao carregar da API
     if (_errorMessage != null) {
       return Center(
         child: Padding(
@@ -317,7 +360,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // Grid com lista de Pokémon e paginação incremental
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -333,8 +375,11 @@ class _HomeScreenState extends State<HomeScreen> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final pokemon = _pokemonList[index];
+                final isFav = favoriteIds.contains(pokemon.id);
                 return PokemonCard(
                   pokemon: pokemon,
+                  isFavorite: isFav,
+                  onFavoriteToggle: () => _toggleFavorite(pokemon),
                   onTap: () => _openDetail(pokemon),
                 );
               },
@@ -342,8 +387,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-
-        // Indicador de carregamento no rodapé ao rolar
         if (_isLoadingMore)
           const SliverToBoxAdapter(
             child: Padding(
@@ -360,8 +403,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
-        // Espaço final
         const SliverToBoxAdapter(
           child: SizedBox(height: 24),
         ),

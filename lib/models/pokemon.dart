@@ -3,8 +3,8 @@ class Pokemon {
   final String name;
   final String imageUrl;
   final List<String> types;
-  final int height; // decímetros
-  final int weight; // hectogramas
+  final int height;
+  final int weight;
   final List<String> abilities;
   final Map<String, int> stats;
 
@@ -19,46 +19,36 @@ class Pokemon {
     required this.stats,
   });
 
-  // Número formatado com 3 dígitos (ex: #001, #025)
   String get formattedNumber => '#${id.toString().padLeft(3, '0')}';
 
-  // Nome com a primeira letra maiúscula
   String get formattedName {
     if (name.isEmpty) return '';
     return name[0].toUpperCase() + name.substring(1);
   }
 
-  // Altura convertida em metros
   double get heightInMeters => height / 10.0;
 
-  // Peso convertido em quilogramas
   double get weightInKg => weight / 10.0;
 
-  // Cor principal baseada no primeiro tipo
   String get primaryType => types.isNotEmpty ? types.first : 'normal';
 
-  // Fábrica para instanciar a partir do JSON completo da PokéAPI
   factory Pokemon.fromJson(Map<String, dynamic> json) {
     final int id = json['id'] as int;
 
-    // URL oficial de alta resolução
     final String artworkUrl = json['sprites']?['other']?['official-artwork']?['front_default'] ??
         json['sprites']?['front_default'] ??
         'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';
 
-    // Lista de tipos (ex: ['grass', 'poison'])
     final typesList = (json['types'] as List<dynamic>?)
             ?.map((item) => item['type']['name'].toString())
             .toList() ??
         ['normal'];
 
-    // Habilidades
     final abilitiesList = (json['abilities'] as List<dynamic>?)
             ?.map((item) => item['ability']['name'].toString())
             .toList() ??
         [];
 
-    // Estatísticas (HP, Attack, Defense, Special-Attack, Special-Defense, Speed)
     final Map<String, int> statsMap = {};
     if (json['stats'] != null) {
       for (final statItem in json['stats'] as List<dynamic>) {
@@ -80,8 +70,6 @@ class Pokemon {
     );
   }
 
-  // Estrutura para salvar na subcoleção do Cloud Firestore
-  // users/{uid}/favorites/{pokemonId}
   Map<String, dynamic> toFirestoreMap() {
     return {
       'pokemonId': id,
@@ -96,7 +84,6 @@ class Pokemon {
     };
   }
 
-  // Fábrica para carregar do documento do Cloud Firestore
   factory Pokemon.fromFirestoreMap(Map<String, dynamic> map) {
     return Pokemon(
       id: (map['pokemonId'] as num?)?.toInt() ?? 0,
