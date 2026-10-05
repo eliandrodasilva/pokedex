@@ -25,22 +25,21 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_API_KEY',
-    appId: '1:000000000000:web:0000000000000000000000',
-    messagingSenderId: '000000000000',
-    projectId: 'pokedex-demo',
-    authDomain: 'pokedex-demo.firebaseapp.com',
-    storageBucket: 'pokedex-demo.firebasestorage.app',
+    apiKey: 'AIzaSyCrfQaU6FzWIWUhC-sdhuMHtIQOI76TFAU',
+    appId: '1:816967633374:web:3aee1e6b8fff3487e0754f',
+    messagingSenderId: '816967633374',
+    projectId: 'pokedex-app-515df',
+    authDomain: 'pokedex-app-515df.firebaseapp.com',
+    storageBucket: 'pokedex-app-515df.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_API_KEY',
-    appId: '1:000000000000:android:0000000000000000000000',
-    messagingSenderId: '000000000000',
-    projectId: 'pokedex-demo',
-    storageBucket: 'pokedex-demo.firebasestorage.app',
+    apiKey: 'AIzaSyCuQZGzhTzvc9qktz-mu6YQU9McMbgpoJM',
+    appId: '1:816967633374:android:e702fe1478c04fabe0754f',
+    messagingSenderId: '816967633374',
+    projectId: 'pokedex-app-515df',
+    storageBucket: 'pokedex-app-515df.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'YOUR_API_KEY',
     appId: '1:000000000000:ios:0000000000000000000000',
@@ -51,10 +50,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'YOUR_API_KEY',
-    appId: '1:000000000000:web:0000000000000000000000',
-    messagingSenderId: '000000000000',
-    projectId: 'pokedex-demo',
-    storageBucket: 'pokedex-demo.firebasestorage.app',
+    apiKey: 'AIzaSyCrfQaU6FzWIWUhC-sdhuMHtIQOI76TFAU',
+    appId: '1:816967633374:web:016651c5d8db9f15e0754f',
+    messagingSenderId: '816967633374',
+    projectId: 'pokedex-app-515df',
+    authDomain: 'pokedex-app-515df.firebaseapp.com',
+    storageBucket: 'pokedex-app-515df.firebasestorage.app',
   );
 }
